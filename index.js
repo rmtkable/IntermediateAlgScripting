@@ -4,7 +4,14 @@
 // For example, sumAll([4,1]) should return 10 because sum of all the numbers between 1 and 4 (both inclusive) is 10.
 
 function sumAll(arr) {
-    return 1;
+    var max = Math.max(arr[0], arr[1]);
+    var min = Math.min(arr[0], arr[1]);
+    var sum = 0;
+
+    for(var i = min; i <= max; i++){
+      sum += i;
+    }
+    return sum;
   }
   
   sumAll([1, 4]);
@@ -16,6 +23,16 @@ function sumAll(arr) {
 // You can return the array with its elements in any order.
 function diffArray(arr1, arr2) {
     var newArr = [];
+    function onlyInFirst(first, second){
+      //looping through arrays to find values that don't exist in the other
+      for(var i = 0; i < first.length; i++){
+        if(second.indexOf(first[i]) === -1){
+          newArr.push(first[i]);
+        }
+      }
+    }
+    onlyInFirst(arr1, arr2);
+    onlyInFirst(arr2, arr1);
     return newArr;
   }
   
@@ -28,7 +45,17 @@ function diffArray(arr1, arr2) {
 // You have to use the arguments object.
 
 function destroyer(arr) {
-    return arr;
+    var args = Array.prototype.slice.call(arguments);
+    //loop over the array
+    for(var i = 0; i < arr.length; i++){
+      //loop over the arguments
+      for(var j = 0; j < args.length; j++){
+        if (arr[i] === args[j]){
+          delete arr[i];
+        }
+      }
+    }
+    return arr.filter(Boolean);
   }
   
   destroyer([1, 2, 3, 1, 2, 3], 2, 3);
@@ -40,12 +67,18 @@ function destroyer(arr) {
 // For example, if the first argument is [{ first: "Romeo", last: "Montague" }, { first: "Mercutio", last: null }, { first: "Tybalt", last: "Capulet" }], and the second argument is { last: "Capulet" }, then you must return the third object from the array (the first argument), because it contains the name and its value, that was passed on as the second argument.
 
 function whatIsInAName(collection, source) {
-    var arr = [];
-    // Only change code below this line
-  
-  
-    // Only change code above this line
-    return arr;
+    const sourceKeys = Object.keys(source);
+
+    return collection.filter(function(obj){
+      for(var i = 0; i < sourceKeys.length; i++){
+        if(
+          !obj.hasOwnProperty(sourceKeys[i]) || obj[sourceKeys[i]] !== source[sourceKeys[i]]
+        ){
+          return false;
+        }
+      }
+      return true;
+    })
   }
   
   whatIsInAName([{ first: "Romeo", last: "Montague" }, { first: "Mercutio", last: null }, { first: "Tybalt", last: "Capulet" }], { last: "Capulet" });
@@ -53,7 +86,9 @@ function whatIsInAName(collection, source) {
 //   5.Intermediate Algorithm Scripting: Spinal Tap Case
 //   Convert a string to spinal case. Spinal case is all-lowercase-words-joined-by-dashes.
 function spinalCase(str) {
-    return str;
+    str = str.replace(/([a-z])([A-Z])/g, "$1 $2");
+
+    return str.toLowerCase().split(/(?:_| )+/).join('-');
   }
   
   spinalCase('This Is Spinal Tap');
@@ -69,7 +104,10 @@ function spinalCase(str) {
 
 // Translate the provided string to Pig Latin. Input strings are guaranteed to be English words in all lowercase.
 function translatePigLatin(str) {
-    return str;
+    let consonantRegex = /^[^aeiou]+/;
+    let myConsonants = str.match(consonantRegex);
+
+    return myConsonants !== null ? str.replace(consonantRegex, '').concat(myConsonants).concat('ay') : str.concat('way');
   }
   
   translatePigLatin("consonant");
@@ -88,6 +126,17 @@ function translatePigLatin(str) {
 // Preserve the case of the first character in the original word when you are replacing it. For example if you mean to replace the word "Book" with the word "dog", it should be replaced as "Dog"
 
 function myReplace(str, before, after) {
+    //find index where before is on the string
+    var index = str.indexOf(before);
+    //check to see if the first letter is uppercase or not
+    if(str[index] === str[index].toUpperCase()){
+      //change the after wod to be capitalized before we use it
+      after = after.charAt(0).toUpperCase() + after.slice(1);
+    } else {
+      //change the after word to be uncapitalized before we use it
+      after =after.charAt(0).toLowerCase() + after.slice(1);
+    }
+    str = str.replace(before, after);
     return str;
   }
   
@@ -107,7 +156,28 @@ function myReplace(str, before, after) {
 
 // The character and its pair are paired up in an array, and all the arrays are grouped into one encapsulating array.
 function pairElement(str) {
-    return str;
+    var paired = [];
+
+    var search = function(char){
+      switch(char){
+        case 'A':
+          paired.push(["A", "T"]);
+          break;
+        case 'T':
+          paired.push(["T", "A"]);
+          break;
+        case 'C':
+          paired.push(["C", "G"]);
+          break;
+        case 'G':
+          paired.push(["G", "C"]);
+          break;
+      }
+    }
+    for(var i = 0; i < str.length; i++){
+      search(str[i]);
+    }
+    return paired;
   }
   
   pairElement("GCG");
@@ -117,7 +187,15 @@ function pairElement(str) {
 
 // If all letters are present in the range, return undefined.
 function fearNotLetter(str) {
-    return str;
+    for (var i = 0; i < str.length; i++){
+      //grab the code of the current character and stores it in a variable
+      var code = str.charCodeAt(i);
+      //if code of current character is not equal to the first character
+      if(code !== str.charCodeAt(0) + i){
+        return String.fromCharCode(code - 1);
+      }
+    }
+    return undefined;
   }
   
   fearNotLetter("abce");
@@ -133,7 +211,22 @@ function fearNotLetter(str) {
 // Check the assertion tests for examples.
 
 function uniteUnique(arr) {
-    return arr;
+    var finalArray = [];
+
+    //loop through the arguments object to make it work with two or more arrays
+    for(var i = 0; i < arguments.length; i++){
+      var arrayArguments = arguments[i];
+
+      //looop through the array at hand
+      for(var j = 0; j < arrayArguments.length; j++){
+        var indexValue = arrayArguments[j];
+        //check if the value is already on the finalArray
+        if (finalArray.indexOf(indexValue) < 0){
+          finalArray.push(indexValue);
+        }
+      }
+    }
+    return finalArray;
   }
   
   uniteUnique([1, 3, 2], [5, 2, 1, 4], [2, 1]);
@@ -143,7 +236,29 @@ function uniteUnique(arr) {
 // Convert the characters &, <, >, " (double quote), and ' (apostrophe), in a string to their corresponding HTML entities.
 
 function convertHTML(str) {
-    return str;
+    var temp = str.split('');
+
+    for (var i = 0; i < temp.length; i++){
+      switch(temp[i]){
+        case "<":
+          temp[i] = "&lt;";
+          break;
+        case "&":
+          temp[i] = "&amp;";
+          break;
+        case ">":
+          temp[i] = "&gt;";
+          break;
+        case '"':
+          temp[i] = "&quot;";
+          break;
+        case "'":
+          temp[i] = "&apos;";
+          break;
+      }
+    }
+    temp = temp.join("");
+    return temp;
   }
   
   convertHTML("Dolce & Gabbana");
@@ -157,7 +272,18 @@ function convertHTML(str) {
 // For example, sumFibs(10) should return 10 because all odd Fibonacci numbers less than or equal to 10 are 1, 1, 3, and 5.
 
 function sumFibs(num) {
-    return num;
+    var prevNum = 0;
+    var currNum = 1;
+    var result = 0;
+
+    while(currNum <= num){
+      if(currNum % 2 !== 0){
+        result += currNum;
+      }
+      currNum += prevNum;
+      prevNum = currNum - prevNum;
+    }
+    return result;
   }
   
   sumFibs(4);
@@ -170,10 +296,42 @@ function sumFibs(num) {
 // Rewrite sumPrimes so it returns the sum of all prime numbers that are less than or equal to num.
 
 function sumPrimes(num) {
-    return num;
+    function isPrime(num){
+      for(let i = 2; i <= Math.sqrt(num); i++){
+        if(num % i == 0){
+          return false;
+        }
+        return true;
+      }
+    }
+    let sum = 0;
+    for(let i = 2; i <= num; i++){
+      if (isPrime(i))
+      sum += i;
+    }
+    return sum;
   }
   
   sumPrimes(10);
+
+  function sumPrimes(num) {
+    // Helper function to check primality
+    function isPrime(num) {
+      for (let i = 2; i <= Math.sqrt(num); i++) {
+        if (num % i == 0)
+          return false;
+      }
+      return true;
+    }
+  
+    // Check all numbers for primality
+    let sum = 0;
+    for (let i = 2; i <= num; i++) {
+      if (isPrime(i))
+        sum += i;
+    }
+    return sum;
+  }
 
 //   14. Intermediate Algorithm Scripting: Smallest Common Multiple
 // Find the smallest common multiple of the provided parameters that can be evenly divided by both, as well as by all sequential numbers in the range between these parameters.
@@ -183,7 +341,25 @@ function sumPrimes(num) {
 // For example, if given 1 and 3, find the smallest common multiple of both 1 and 3 that is also evenly divisible by all numbers between 1 and 3. The answer here would be 6.
 
 function smallestCommons(arr) {
-    return arr;
+    const [min, max] = arr.sort((a,b) => a - b);
+    const numberDivisors = max - min + 1;
+    //largest possible value for SCM
+    let upperBound = 1;
+    for (let i = min; i <= max; i++){
+      upperBound *= i;
+    }
+    for (let multiple = max; multiple <= upperBound; multiple += max){
+      //check if every value in range divdies by "multiple"
+      let divisorCount = 0;
+      for (let i = min; i <= max; i++){
+        if (multiple % i === 0){
+          divisorCount += 1;
+        }
+      }
+      if (divisorCount === numberDivisors){
+        return multiple;
+      }
+    }
   }
   
   
@@ -194,10 +370,13 @@ function smallestCommons(arr) {
   
 //   Then return the rest of the array once the condition is satisfied, otherwise, arr should be returned as an empty array.
 function dropElements(arr, func) {
+    while (arr.length > 0 && !func(arr[0])){
+      arr.shift()
+    }
     return arr;
   }
   
-  dropElements([1, 2, 3], function(n) {return n < 3; });
+  dropElements([1, 2, 3, 4], function(n) {return n >= 3; });
 
 
 
@@ -205,7 +384,16 @@ function dropElements(arr, func) {
 // Flatten a nested array. You must account for varying levels of nesting.
 
 function steamrollArray(arr) {
-    return arr;
+    const flattenedArray = [];
+    //loop over the array contents
+    for(let i = 0; i < arr.length; i++){
+      if(Array.isArray(arr[i])){
+        flattenedArray.push(...steamrollArray(arr[i]));
+      } else {
+        flattenedArray.push(arr[i]);
+      }
+    }
+    return flattenedArray;
   }
   
   steamrollArray([1, [2], [3, [[4]]]]);
@@ -217,7 +405,11 @@ function steamrollArray(arr) {
 
 // The binary string will be space separated.
 function binaryAgent(str) {
-    return str;
+    return String.fromCharCode(
+      ...str.split(" ").map(function(char){
+        return parseInt(char, 2);
+      })
+    )
   }
   
   binaryAgent("01000001 01110010 01100101 01101110 00100111 01110100 00100000 01100010 01101111 01101110 01100110 01101001 01110010 01100101 01110011 00100000 01100110 01110101 01101110 00100001 00111111");
@@ -233,7 +425,16 @@ function binaryAgent(str) {
 // Remember, you can access object properties through either dot notation or [] notation.
 
 function truthCheck(collection, pre) {
-    return pre;
+    //create a counter to check how many are true
+    let counter = 0;
+    //check for each object
+    for (let c in collection){
+      //if it has a property and value is truthy
+      if (collection[c].hasOwnProperty(pre) && Boolean(collection[c][pre])){
+        counter++;
+      }
+    }
+    return counter == collection.length;
   }
   
   truthCheck([{"user": "Tinky-Winky", "sex": "male"}, {"user": "Dipsy", "sex": "male"}, {"user": "Laa-Laa", "sex": "female"}, {"user": "Po", "sex": "female"}], "sex");
@@ -254,7 +455,14 @@ function truthCheck(collection, pre) {
 // If either argument isn't a valid number, return undefined.
 
 function addTogether() {
-    return false;
+    const [first, second] = arguments;
+    if(typeof(first) !== "number")
+      return undefined;
+    if(second === undefined)
+      return(second) => addTogether(first, second);
+    if(typeof(second) !== "number")
+      return undefined;
+    return first + second;
   }
   
   addTogether(2,3);
@@ -276,10 +484,31 @@ function addTogether() {
 var Person = function(firstAndLast) {
     // Only change code below this line
     // Complete the method below and implement the others similarly
+    let fullName = firstAndLast;
+
+    this.getFirstName = function(){
+      return fullName.split(" ")[0]
+    }
+
+    this.getLastName = function() {
+      return fullName.split(" ")[1]
+    }
+
     this.getFullName = function() {
-      return "";
+      return fullName;
     };
-    return firstAndLast;
+    
+    this.setFirstName = function(name){
+      fullName = name + " " + fullName.split(" ")[1];
+    }
+
+    this.setLastName = function(name){
+      fullName = fullName.split(" ")[0] + " " + name;
+    }
+
+    this.setFullName = function(name) {
+      fullName = name;
+    }
   };
   
   var bob = new Person('Bob Ross');
@@ -300,7 +529,19 @@ var Person = function(firstAndLast) {
 function orbitalPeriod(arr) {
     var GM = 398600.4418;
     var earthRadius = 6367.4447;
-    return arr;
+    var a = 2 * Math.PI;
+    var newArr = [];
+
+    var getOrbPeriod = function(obj){
+      var c = Math.pow(earthRadius + obj.avgAlt, 3);
+      var b = Math.sqrt(c / GM);
+      var orbPeriod = Math.round(a * b);
+      return {name: obj.name, orbitalPeriod: orbPeriod};
+    }
+    for(var elem in arr){
+      newArr.push(getOrbPeriod(arr[elem]));
+    }
+    return newArr;
   }
   
   orbitalPeriod([{name : "sputnik", avgAlt : 35873.5553}]);
@@ -317,9 +558,14 @@ function orbitalPeriod(arr) {
 // We'll also pass strings with special symbols, such as "2A3*3a2", "2A3 3a2", and "2_A3*3#A2".
 
 function palindrome(str) {
-    return true;
-  }
-  
-  
-  
+    return (
+      str.replace(/[\W_]/g, "").toLowerCase() ===
+      str
+        .replace(/[\W_]/g, "")
+        .toLowerCase()
+        .split("")
+        .reverse()
+        .join("")
+    );
+  }  
   palindrome("eye");
